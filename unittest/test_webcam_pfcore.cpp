@@ -68,19 +68,19 @@ class SimpleMotionTracker : public TrackingProblem
                                    void *extra_data)
   {
     images[0].copyTo(Icurr);
-    GaussianBlur(Icurr,Icurr_smooth,Size(5,5),2.0,2.0);
+    GaussianBlur(Icurr,Icurr_smooth,Size(3,3),1.0,1.0);
 
     if( Iprev.empty() ) {
       Icurr.copyTo(Iprev);
+      Icurr_smooth.copyTo(Iprev_smooth);
       dIdt = 0 * Icurr;
-    } else {
-      absdiff(Icurr_smooth,Iprev_smooth,dIdt);
     }
     cv::cvtColor( dIdt, dIdt_grey, CV_RGB2GRAY );
     Mat f2f = cv::estimateRigidTransform(Iprev,Icurr,1);
     f2f.copyTo(affineFrame2Frame);
     pixel_velocity_x = f2f.at<double>(0,2);
     pixel_velocity_y = f2f.at<double>(1,2);
+    absdiff(Icurr_smooth,Iprev_smooth,dIdt);
 
     bool printF2F = false;
     if( printF2F ) {
@@ -93,7 +93,7 @@ class SimpleMotionTracker : public TrackingProblem
   }
 
   virtual size_t Nparticles() const {
-    return 10; // x,y,vx,vy
+    return 100; // x,y,vx,vy
   }
 
   virtual void outputCallback(const vector<Mat> &particles,
@@ -101,10 +101,11 @@ class SimpleMotionTracker : public TrackingProblem
   {
     // Assign the "low dimensional outputs"
 
-    track_box.x      = Icurr.cols / 2;
-    track_box.y      = Icurr.rows / 2;
     track_box.width  = 20;
     track_box.height = 20;
+    track_box.x      = Icurr.cols / 2 - track_box.width/2;
+    track_box.y      = Icurr.rows / 2 - track_box.height/2;
+
 
     Icurr.copyTo(Iprev);
     Icurr_smooth.copyTo(Iprev_smooth);
@@ -120,7 +121,7 @@ public:
 
   /** draw the track_box on top of an image, for display */
   void drawTrackBox( Mat& outimg ) {
-    Icurr.copyTo(outimg);
+    outimg = dIdt;
     rectangle(outimg, track_box, Scalar(255,255,255),3,CV_AA);
     int N = Nparticles();
     double dmin, dmax;
@@ -128,9 +129,13 @@ public:
     for( int k = 0; k < N; k++ ) {
       int x    = (int) particles[k].at<double>(0);
       int y    = (int) particles[k].at<double>(1);
-      int rval = (int) (sqrt(weights[k] / dmax) * 255.0);
-      circle(outimg, Point2f(x,y),3,Scalar(rval,0,0),1,CV_AA);
+      Point2f pix_point;
+      pix_point.x = x;
+      pix_point.y = y;
+      int rval = (int) (sqrt(weights[k] / dmax) * 100.0) + 150;
+      circle(outimg, pix_point,5,Scalar(rval,0,rval),2,CV_AA);
     }
+
   }
 
   void setupTrackingProblem( ) {
@@ -148,6 +153,7 @@ private:
   Mat Icurr;
   Mat Iprev;
   Mat Iprev_smooth;
+  Mat Iprev_smooth_warped;
   Mat Icurr_smooth;
 
   Mat affineFrame2Frame;

@@ -74,7 +74,8 @@ struct PFTracker::PFCore
     int N = tracking_problem->Nparticles();
     double wmin = 1.0;
     double wmax = 0.0;
-    int idx_max, idx_min;
+    int idx_max = 0;
+    int idx_min = 0;
 
     for( int k = 0; k < N; k++ )
     { // TODO: resample properly
