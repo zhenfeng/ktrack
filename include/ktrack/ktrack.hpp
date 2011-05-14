@@ -48,11 +48,15 @@ public:
 
   /** Number of states in particles.
    * This is called at registration time and must not change! */
-  virtual size_t N() const = 0;
+  virtual size_t Nstates() const = 0;
+
+  /** Number of particles in filter.
+   * This is called at registration time and must not change! */
+  virtual size_t Nparticles() const = 0;
 
   /** application-specific processing of the distributed particles.
-      for example, evaluate a low dimensional output from "contour" to
-     "centroid". */
+      e.g. taking the mean or k-means of coordinates
+      */
   virtual void outputCallback( const std::vector<cv::Mat>& particles,
                                const std::vector<double>& weights ) = 0;
 

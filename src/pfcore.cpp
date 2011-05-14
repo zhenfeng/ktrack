@@ -4,8 +4,11 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <list>
 
 using std::vector;
+using std::cout;
+using std::endl;
 using namespace cv;
 
 namespace ktrack
@@ -22,14 +25,32 @@ struct PFTracker::PFCore
   typedef boost::shared_ptr<PFCore> Ptr;
   typedef boost::shared_ptr<const PFCore> ConstPtr;
 
-  PFCore(TrackingProblem::Ptr trackprob)
+  PFCore(TrackingProblem::Ptr trackprob) : tracking_problem(trackprob)
   {
-    tracking_problem = trackprob;
+  }
+
+  void initPFCore()
+  {
+    cout << "initializing PFCore ... " ;
+    Assert(tracking_problem);
+
+    int Nstates    = tracking_problem->Nstates();
+    int Nparticles = tracking_problem->Nparticles();
+
+    particles_estm = vector<Mat>( Nparticles );
+    particles_pred = vector<Mat>( Nparticles );
+    weights        = vector<double>(Nparticles,1.0 / Nparticles);
+    likelihood     = vector<double>(Nparticles,0.0);
+
+    for( int k = 0; k < Nparticles; k++ ) {
+      particles_estm[k] = Mat::zeros(Nstates,1,CV_64F);
+      particles_pred[k] = Mat::zeros(Nstates,1,CV_64F);
+    }
+    cout << "Nstates="<<Nstates<<", Nparticles="<<Nparticles<<endl;
   }
 
   std::vector<cv::Mat>  particles_estm; // estimate
   std::vector<cv::Mat>  particles_pred; // prediction
-
   std::vector<double>   weights;
   std::vector<double>   likelihood;
 
@@ -37,16 +58,44 @@ struct PFTracker::PFCore
 
   void updateWeights( )
   {
-
+    int N = tracking_problem->Nparticles();
+    double wsum = 1e-9;
+    for( int k = 0; k < N; k++ ) {
+      weights[k] = weights[k] * likelihood[k];
+      wsum      += weights[k];
+    }
+    for( int k = 0; k < N; k++ ) {
+      weights[k] /= wsum;
+    }
   }
 
   void resampleParticles( )
   {
+    int N = tracking_problem->Nparticles();
+    double wmin = 1.0;
+    double wmax = 0.0;
+    int idx_max, idx_min;
 
+    for( int k = 0; k < N; k++ )
+    { // TODO: resample properly
+      particles_pred[k].copyTo(particles_estm[k]);
+      if( weights[k] > wmax ) {
+        wmax = weights[k];
+        idx_max = k;
+      } else if ( weights[k] < wmin ) {
+        wmin = weights[k];
+        idx_min = k;
+      }
+    }
+    particles_estm[idx_max].copyTo(particles_estm[idx_min]);
   }
 
   void processNewData(const vector<Mat>& image_data, void* extra_data )
   {
+    if( particles_estm.empty() ) {
+      initPFCore();
+    }
+
     // register the data with TrackingProblem
     tracking_problem->registerCurrentData( image_data, extra_data);
 
@@ -55,6 +104,8 @@ struct PFTracker::PFCore
 
     // compute p(z_k | \hat{x}_k )
     tracking_problem->evaluateLikelihood( particles_pred, likelihood);
+
+    std::cout << Mat(likelihood) << std::endl;
 
     // compute w_k \prop w_{k-1} * p(z_k | \hat{x}_k )
     updateWeights();     // modifies weights
@@ -70,7 +121,7 @@ struct PFTracker::PFCore
 
 
 PFTracker::PFTracker(TrackingProblem::Ptr trackprob) :
-                                 pf_core( new PFCore(trackprob) )
+  pf_core( new PFCore(trackprob) )
 {
 }
 
