@@ -11,8 +11,11 @@ using namespace cv;
 namespace ktrack
 {
 
-#define Assert(x) ( (x) ? int(0) :  throw std::logic_error("bad") )
+#define Assert(x) ( (x) ? int(0) :  throw std::logic_error("broke") )
 
+
+/** Implement the 'opaque pointer'
+  */
 struct PFTracker::PFCore
 {
   /** convenience definitions */
@@ -24,24 +27,45 @@ struct PFTracker::PFCore
     tracking_problem = trackprob;
   }
 
-  std::vector<cv::Mat>  particles;
+  std::vector<cv::Mat>  particles_estm; // estimate
+  std::vector<cv::Mat>  particles_pred; // prediction
 
   std::vector<double>   weights;
-
   std::vector<double>   likelihood;
 
-  /** keep a handle on the user-defined problem */
   TrackingProblem::Ptr tracking_problem;
 
+  void updateWeights( )
+  {
+
+  }
+
+  void resampleParticles( )
+  {
+
+  }
 
   void processNewData(const vector<Mat>& image_data, void* extra_data )
   {
     // register the data with TrackingProblem
     tracking_problem->registerCurrentData( image_data, extra_data);
 
-    tracking_problem->evaluateLikelihood( particles, likelihood);
+    // compute \hat{x}_k | x_{k-1}
+    tracking_problem->propagateDynamics( particles_estm, particles_pred );
 
+    // compute p(z_k | \hat{x}_k )
+    tracking_problem->evaluateLikelihood( particles_pred, likelihood);
+
+    // compute w_k \prop w_{k-1} * p(z_k | \hat{x}_k )
+    updateWeights();     // modifies weights
+
+    // re-sample to get rid of negligible weight particles
+    resampleParticles(); // modifies particles_estm
+
+    // display callback on the TrackingProblem with current x_k
+    tracking_problem->outputCallback( particles_estm, weights );
   }
+
 };
 
 

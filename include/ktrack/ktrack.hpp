@@ -25,7 +25,7 @@ namespace ktrack
 
 /** \abstract, \interface defines the problem-specific stuff
    clients must implement evaluateLikelihood, propagateDynamics, N,
-   getLowDimOutput, and must perform any GUI / display / output. */
+   outputCallback, and must perform any GUI / display / output. */
 class TrackingProblem
 {
 public:
@@ -34,23 +34,27 @@ public:
   {
   }
 
+  //*************************************
+  // required interfaces
+  //*************************************
+
   /** evaluate likelihood */
   virtual void evaluateLikelihood( const std::vector<cv::Mat>& particles,
                                    std::vector<double>& likelihood ) = 0;
 
   /** propagate dynamics */
   virtual void propagateDynamics( const std::vector<cv::Mat>& particles_in,
-                                 const std::vector<cv::Mat>& particles_out ) = 0;
+                                        std::vector<cv::Mat>& particles_out ) = 0;
 
   /** Number of states in particles.
    * This is called at registration time and must not change! */
   virtual size_t N() const = 0;
 
-  /** evaluate a low dimensional output, such as from "contour" to
-     "centroid" for example. */
-  virtual void getLowDimOutput( const std::vector<cv::Mat>& particles,
-                                const std::vector<double>& weights,
-                                std::vector<double>& output ) = 0;
+  /** application-specific processing of the distributed particles.
+      for example, evaluate a low dimensional output from "contour" to
+     "centroid". */
+  virtual void outputCallback( const std::vector<cv::Mat>& particles,
+                               const std::vector<double>& weights ) = 0;
 
 
   //*************************************
