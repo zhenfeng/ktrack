@@ -39,8 +39,9 @@ struct PFTracker::PFCore
 
     particles_estm = vector<Mat>( Nparticles );
     particles_pred = vector<Mat>( Nparticles );
-    weights        = vector<double>(Nparticles,1.0 / Nparticles);
+    weights        = vector<double>(Nparticles,0.0);
     likelihood     = vector<double>(Nparticles,0.0);
+    cdf            = vector<double>(Nparticles,0.0);
 
     for( int k = 0; k < Nparticles; k++ ) {
       particles_estm[k] = Mat::zeros(Nstates,1,CV_64F);
@@ -52,6 +53,7 @@ struct PFTracker::PFCore
   std::vector<cv::Mat>  particles_estm; // estimate
   std::vector<cv::Mat>  particles_pred; // prediction
   std::vector<double>   weights;
+  std::vector<double>   cdf;
   std::vector<double>   likelihood;
 
   TrackingProblem::Ptr tracking_problem;
@@ -66,7 +68,10 @@ struct PFTracker::PFCore
     }
     for( int k = 0; k < N; k++ ) {
       weights[k] /= wsum;
+      int kprev = (k > 0 ) ? (k-1) : 0;
+      cdf[k]    = cdf[kprev] + weights[k];
     }
+
   }
 
   void resampleParticles( )
@@ -76,6 +81,9 @@ struct PFTracker::PFCore
     double wmax = 0.0;
     int idx_max = 0;
     int idx_min = 0;
+
+
+
 
     for( int k = 0; k < N; k++ )
     { // TODO: resample properly
@@ -106,13 +114,11 @@ struct PFTracker::PFCore
     // compute p(z_k | \hat{x}_k )
     tracking_problem->evaluateLikelihood( particles_pred, likelihood);
 
-    std::cout << Mat(likelihood) << std::endl;
-
     // compute w_k \prop w_{k-1} * p(z_k | \hat{x}_k )
     updateWeights();     // modifies weights
 
     // re-sample to get rid of negligible weight particles
-    resampleParticles(); // modifies particles_estm
+    resampleParticles(); // particles_pred -> particles_estm
 
     // display callback on the TrackingProblem with current x_k
     tracking_problem->outputCallback( particles_estm, weights );
@@ -137,6 +143,8 @@ void PFTracker::processNewData( const vector<Mat>& image_data, void* extra_data 
 
 
 } // end namespace
+
+
 
 
 #if 0    //  Kolyma

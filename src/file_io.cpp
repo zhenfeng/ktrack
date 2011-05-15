@@ -10,6 +10,7 @@
 #include <dirent.h>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -50,6 +51,7 @@ void getFilePrefixes(const char * dir, const string& extension,
         }
     }
     closedir(dp);
+    std::sort(files.begin(), files.end());
 }
 int getFileNum(const char * dir, const std::string& extension) {
     int count = 0;
