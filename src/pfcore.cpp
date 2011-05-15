@@ -16,6 +16,8 @@ namespace ktrack
 
 #define Assert(x) ( (x) ? int(0) :  throw std::logic_error("broke") )
 
+double gen_rand::range = 1.0; // initialize static variable
+
 
 /** Implement the 'opaque pointer'
   */
@@ -54,6 +56,7 @@ struct PFTracker::PFCore
   std::vector<cv::Mat>  particles_pred; // prediction
   std::vector<double>   weights;
   std::vector<double>   cdf;
+  std::vector<double>   sampler;
   std::vector<double>   likelihood;
 
   TrackingProblem::Ptr tracking_problem;
@@ -74,6 +77,20 @@ struct PFTracker::PFCore
 
   }
 
+  static int closestIndex( const vector<double>& sampler, double val)
+  { // TODO: do this more smartly, e.g. binary search
+    double distMin = 1e6;
+    int    idxMin  = -1;
+    for( int k = 0; k < (int) sampler.size(); k++ ) {
+      double dist  = abs(sampler[k] - val);
+      if( dist < distMin ) {
+        distMin = dist;
+        idxMin  = k;
+      }
+    }
+    return idxMin;
+  }
+
   void resampleParticles( )
   {
     int N = tracking_problem->Nparticles();
@@ -82,11 +99,13 @@ struct PFTracker::PFCore
     int idx_max = 0;
     int idx_min = 0;
 
-
-
+    gen_rand::random_vector(sampler,1.0);
 
     for( int k = 0; k < N; k++ )
-    { // TODO: resample properly
+    {
+      int idx = closestIndex( cdf, sampler[k] );
+      cout << idx << endl;
+      // TODO: resample properly
       particles_pred[k].copyTo(particles_estm[k]);
       if( weights[k] > wmax ) {
         wmax = weights[k];

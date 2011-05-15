@@ -114,6 +114,25 @@ private:
 
 
 
+struct gen_rand {
+    static double range;
+public:
+    gen_rand(){}
+    double operator()() {
+        return (rand()/(double)RAND_MAX) * range;
+    }
+    static void random_vector( std::vector<double>& x, double maxval = 1.0) {
+      range = maxval;
+      std::generate_n(x.begin(), x.size(), gen_rand());
+    }
+
+    /** \example
+           std::vector<double> x(num_items);
+           std::generate_n(x.begin(), num_items, gen_rand());
+           // now "x" contains random numbers
+      */
+};
+
 
 }
 

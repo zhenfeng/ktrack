@@ -33,8 +33,8 @@ class SimpleMotionTracker : public TrackingProblem
     for( int k = 0; k < N; k++ ) {
       int x = (int) particles[k].at<double>(0);
       int y = (int) particles[k].at<double>(1);
-      likelihood[k] = 1e-3 + dIdt_grey.at<unsigned char>(y,x) * 1.0 +
-                             Icurr_grey.at<unsigned char>(y,x) * 0.05;
+      likelihood[k] = 1e-3 + (dIdt_grey.at<unsigned char>(y,x) * 1.0 ) /
+                             Icurr_grey.at<unsigned char>(y,x);
     }
   }
 
@@ -50,19 +50,21 @@ class SimpleMotionTracker : public TrackingProblem
 
     if( weights.empty() ) { // initialize to center
       weights = std::vector<double>(N,1.0/N);
+      rand_x  = std::vector<double>(N,0);
+      rand_y  = std::vector<double>(N,0);
       for( int k = 0; k < N; k++ ) {
         particles_out[k].at<double>(0) = Icurr.cols/2.0;
         particles_out[k].at<double>(1) = Icurr.rows/2.0;
       }
     } else {
-
+      gen_rand::random_vector(rand_x,DiffusionRange);
+      gen_rand::random_vector(rand_y,DiffusionRange);
       for( int k = 0; k < N; k++ ) {
-        diffusion.at<double>(0) = DiffusionRange * (-1.0 + 2.0 * (rand()%107)/107.0 );
-        diffusion.at<double>(1) = DiffusionRange * (-1.0 + 2.0 * (rand()%107)/107.0 );
+
         double newx = particles_in[k].at<double>(0);
         double newy = particles_in[k].at<double>(1);
-        newx       += pixel_velocity_x + diffusion.at<double>(0);
-        newy       += pixel_velocity_y + diffusion.at<double>(1);
+        newx       += pixel_velocity_x + 2*rand_x[k] - DiffusionRange;
+        newy       += pixel_velocity_y + 2*rand_y[k] - DiffusionRange;
 
         // using data inside the prior
         newx       += 1e-3 * (Icurr.cols/2  - newx );
@@ -131,12 +133,10 @@ class SimpleMotionTracker : public TrackingProblem
                               const vector<double> &weights)
   {
     // Assign the "low dimensional outputs"
-
     track_box.width  = 20;
     track_box.height = 20;
     track_box.x      = Icurr.cols / 2 - track_box.width/2;
     track_box.y      = Icurr.rows / 2 - track_box.height/2;
-
 
     Icurr.copyTo(Iprev);
     Icurr_smooth.copyTo(Iprev_smooth);
@@ -184,10 +184,9 @@ public:
   }
 
   void setupTrackingProblem( ) {
-    diffusion = Mat::zeros(Nstates(),1,CV_64F);
 
+    // put any initializations here
 
-    Assert( 2 == Nstates() );
   }
 
   // **** Data specific to this incarnation of TrackingProblem
@@ -204,7 +203,8 @@ private:
   Mat Icurr_smooth;
 
   Mat affineFrame2Frame;
-  Mat diffusion;
+  vector<double> rand_x;
+  vector<double> rand_y;
   vector<Mat> particles;
   vector<double> weights;
 
@@ -233,7 +233,7 @@ int main( int argc, char* argv [] )
   cout << "looking for files of extension " << file_ext << endl;
   vector<string> image_files;
   getFilePrefixes(argv[1],file_ext,image_files);
-
+  bool bWriteImages = false; // get it from arg!
 
   namedWindow(window_name);
 
@@ -257,7 +257,9 @@ int main( int argc, char* argv [] )
     imshow(window_name,image_container[0]);
     imshow(window_name + "diff",image_container[1]);
 
-    imwrite(filename + ".out.png", image_container[0] );
+    if( bWriteImages ) {
+      imwrite(filename + ".out.png", image_container[0] );
+    }
 
     char key = waitKey(15);
     if( 'q' == key ) // quick if we hit q key
