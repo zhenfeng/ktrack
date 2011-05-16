@@ -41,9 +41,11 @@ struct PFTracker::PFCore
 
     particles_estm = vector<Mat>( Nparticles );
     particles_pred = vector<Mat>( Nparticles );
-    weights        = vector<double>(Nparticles,0.0);
+    weights        = vector<double>(Nparticles,1.0/Nparticles);
     likelihood     = vector<double>(Nparticles,0.0);
     cdf            = vector<double>(Nparticles,0.0);
+    sampler        = vector<double>(Nparticles,0.0);
+    resample_index = vector<int>(Nparticles,0);
 
     for( int k = 0; k < Nparticles; k++ ) {
       particles_estm[k] = Mat::zeros(Nstates,1,CV_64F);
@@ -58,6 +60,7 @@ struct PFTracker::PFCore
   std::vector<double>   cdf;
   std::vector<double>   sampler;
   std::vector<double>   likelihood;
+  std::vector<int>      resample_index;
 
   TrackingProblem::Ptr tracking_problem;
 
@@ -77,12 +80,15 @@ struct PFTracker::PFCore
 
   }
 
-  static int closestIndex( const vector<double>& sampler, double val)
+  static int closestIndex( const vector<double>& svec, double val)
   { // TODO: do this more smartly, e.g. binary search
     double distMin = 1e6;
+    double dist    = 0.0;
+    double sval    = 0.0;
     int    idxMin  = -1;
-    for( int k = 0; k < (int) sampler.size(); k++ ) {
-      double dist  = abs(sampler[k] - val);
+    for( int k = 0; k < (int) svec.size(); k++ ) {
+      sval  = svec[k];
+      dist  = std::fabs(sval - val);
       if( dist < distMin ) {
         distMin = dist;
         idxMin  = k;
@@ -94,28 +100,30 @@ struct PFTracker::PFCore
   void resampleParticles( )
   {
     int N = tracking_problem->Nparticles();
-    double wmin = 1.0;
-    double wmax = 0.0;
-    int idx_max = 0;
-    int idx_min = 0;
-
     gen_rand::random_vector(sampler,1.0);
-
+    double wmin = 1.0/N;
     for( int k = 0; k < N; k++ )
     {
-      int idx = closestIndex( cdf, sampler[k] );
-      cout << idx << endl;
-      // TODO: resample properly
-      particles_pred[k].copyTo(particles_estm[k]);
-      if( weights[k] > wmax ) {
-        wmax = weights[k];
-        idx_max = k;
-      } else if ( weights[k] < wmin ) {
-        wmin = weights[k];
-        idx_min = k;
+      if( weights[k] < wmin ) {
+        double sampval = sampler[k];
+        int    sampidx = closestIndex( cdf, sampval );
+        particles_pred[sampidx].copyTo(particles_estm[k]);
+        resample_index[k] = sampidx; // where k-th was resampled from
+        weights[k]        = weights[sampidx]/2.0;
+        weights[sampidx]  = weights[sampidx]/2.0;
+      } else {
+        resample_index[k] = k;
       }
     }
-    particles_estm[idx_max].copyTo(particles_estm[idx_min]);
+    //      particles_pred[k].copyTo(particles_estm[k]);
+    //      if( weights[k] > wmax ) {
+    //        wmax = weights[k];
+    //        idx_max = k;
+    //      } else if ( weights[k] < wmin ) {
+    //        wmin = weights[k];
+    //        idx_min = k;
+    //      }
+    //particles_estm[idx_max].copyTo(particles_estm[idx_min]);
   }
 
   void processNewData(const vector<Mat>& image_data, void* extra_data )

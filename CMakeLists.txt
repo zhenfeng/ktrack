@@ -46,7 +46,12 @@ endmacro()
 
 define_module(ktrack)
 
+# sparse field level set region based active contours
+add_subdirectory(extern/sfm_rbac_lankton)
+
+# 'showcase apps' for running on test sequences or on live stream
 add_subdirectory(samples)
 
+# tests to make sure we can build/run without crashing
 add_subdirectory(unittest)
 
