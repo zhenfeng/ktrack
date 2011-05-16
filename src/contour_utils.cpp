@@ -43,6 +43,19 @@ void waterMark(const std::string& text, Mat & img)
 
 
 
+//Mat f2f = cv::estimateRigidTransform(Iprev,Icurr,1);
+//f2f.at<float>(0,1) = 0.0;      f2f.at<float>(0,0) = 1.0;
+//f2f.at<float>(1,0) = 0.0;      f2f.at<float>(1,1) = 1.0;
+//f2f.copyTo(affineFrame2Frame);
+//pixel_velocity_x = f2f.at<double>(0,2);
+//pixel_velocity_y = f2f.at<double>(1,2);
+
+//bool useWarpedInDifference = true;
+//if( useWarpedInDifference ) { // can be unstable at edges
+//  warpAffine(Iprev_smooth,Iprev_smooth_warped,f2f,Iprev.size());
+
+
+
 } // end namespace
 
 

@@ -38,7 +38,7 @@ double *en_lrbac_vessel_yz_compute(LL *Lz,double *phi, double *img, long *dims, 
   F = (double*)malloc(Lz->length*sizeof(double));    if(F==NULL) return NULL;
   kappa = (double*)malloc(Lz->length*sizeof(double));if(kappa==NULL) return NULL;
 
-  ll_init(Lz); n=0; Fmax = 0.00001; //begining of list;
+  ll_init(Lz); n=0; Fmax = 1.0e-6; //begining of list;
   while(Lz->curr != NULL){          //loop through list
     x = Lz->curr->x; y = Lz->curr->y; z = Lz->curr->z; idx = Lz->curr->idx;
     I = img[idx];
@@ -180,7 +180,7 @@ double *en_lrbac_vessel_cv_compute(LL *Lz,double *phi, double *img, long *dims, 
   F = (double*)malloc(Lz->length*sizeof(double));    if(F==NULL) return NULL;
   kappa = (double*)malloc(Lz->length*sizeof(double));if(kappa==NULL) return NULL;
 
-  ll_init(Lz); n=0; Fmax = 0.00001; //begining of list;
+  ll_init(Lz); n=0; Fmax = 1.0e-6; //begining of list;
   while(Lz->curr != NULL){          //loop through list
     x = Lz->curr->x; y = Lz->curr->y; z = Lz->curr->z; idx = Lz->curr->idx;
     I = img[idx];
@@ -448,7 +448,7 @@ double *en_lrbac_compute(LL *Lz,double *phi, double *img, long *dims, double *sc
 
   ll_init(Lz);
   int        n= 0;
-  double Fmax = 0.00001; //begining of list;
+  double Fmax = 1.0e-6; //begining of list;
   while(Lz->curr != NULL){          //loop through list
     x = Lz->curr->x; y = Lz->curr->y; z = Lz->curr->z; idx = Lz->curr->idx;
     I = img[idx];
@@ -793,7 +793,7 @@ double *en_lrbac_user_compute(LL *Lz,double *phi, double *img,double penaltyAlph
   F = (double*)malloc(Lz->length*sizeof(double));    if(F==NULL) return NULL;
   kappa = (double*)malloc(Lz->length*sizeof(double));if(kappa==NULL) return NULL;
 
-  ll_init(Lz); n=0; Fmax = 0.00001; //begining of list;
+  ll_init(Lz); n=0; Fmax = 1.0e-6; //begining of list;
   while(Lz->curr != NULL){          //loop through list
     x = Lz->curr->x;
     y = Lz->curr->y;
