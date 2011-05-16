@@ -107,7 +107,8 @@ void en_lrbac_vessel_yz_init_point(double* img, double* phi, int idx, int x, int
 }
 
 void en_lrbac_vessel_yz_update(double* img, long *dims, LL *Lin2out, LL *Lout2in, double rad, double dthresh){
-  int x,y,z,idx;
+  int x,y,z;
+  int idx;
   int i,j,k,irad,idia,ridx,bidx;
 
   irad = (int)(floor(rad));
@@ -246,7 +247,8 @@ void en_lrbac_vessel_cv_init_point(double* img, double* phi, int idx, int x, int
 }
 
 void en_lrbac_vessel_cv_update(double* img, long *dims, LL *Lin2out, LL *Lout2in, double rad, double dthresh){
-  int x,y,z,idx;
+  int x,y,z;
+  int idx;
   int i,j,k,irad,idia,ridx,bidx;
 
   irad = (int)(floor(rad));
@@ -360,7 +362,8 @@ void en_lrbac_init_point(double* img, double* phi, int idx, int x, int y, int z,
 }
 
 void en_lrbac_update(double* img, long *dims, LL *Lin2out, LL *Lout2in, double rad){
-  int x,y,z,idx;
+  int x,y,z;
+  int idx;
   int i,j,k,irad,idia,ridx,bidx;
 
   irad = (int)(floor(rad));
@@ -436,7 +439,7 @@ void en_lrbac_destroy(){
 }
 
 double *en_lrbac_compute(LL *Lz,double *phi, double *img, long *dims, double *scale, double lam, double rad ){
-  int x,y,z,idx;
+  int x,y,z, idx;
   double *F, *kappa;
   double a,u,v,I;
   // allocate space for F
@@ -505,7 +508,8 @@ double *en_lrbac_gball(double rad){
 }
 
 double *en_yezzi_compute(LL *Lz,double *phi, double *img, long *dims, double *scale, double lam){
-  int x,y,z,idx,n,j;
+  //int x,y,z;
+  int idx,n,j;
   double *F, *kappa;
   double a,Fmax,u,v,I;
   double Gamuu, Gamuv, Gamvv, gamu, gamv, du, dv;
@@ -578,7 +582,7 @@ double *en_yezzi_compute(LL *Lz,double *phi, double *img, long *dims, double *sc
 }
 
 void en_yezzi_init(LL* Lz, double *img, double *phi, long *dims){
-  int x,y,z,idx;
+  /*int x,y,z */ int idx;
   double Gamuu, Gamuv, sumuu, sumuv, Ibar, I2bar;
   sumin = 0; sumout = 0; ain = 0; aout = 0;
   uin = 0; uout = 0; du_orig = 0;
@@ -614,7 +618,7 @@ void en_yezzi_init(LL* Lz, double *img, double *phi, long *dims){
 }
 
 void en_yezzi_update(double* img, long *dims, LL *Lin2out, LL *Lout2in){
-  int x,y,z,idx;
+  /*int x,y,z */ int idx;
   ll_init(Lin2out);
   while(Lin2out->curr != NULL){
     idx = Lin2out->curr->idx;
@@ -926,7 +930,7 @@ void en_user_chanvese_init(double* img, double* phi, long *dims, double* seed){
 }
 
 void en_chanvese_update(double* img, long *dims, LL *Lin2out, LL *Lout2in){
-  int x,y,z,idx;
+  /*int x,y,z */ int idx;
   ll_init(Lin2out);
   while(Lin2out->curr != NULL){
     idx = Lin2out->curr->idx;
@@ -1010,7 +1014,7 @@ void en_meanvar_init(double* img, double* phi, long *dims){
 }
 
 void en_meanvar_update(double* img, long *dims, LL *Lin2out, LL *Lout2in){
-  int x,y,z,idx;
+  /*int x,y,z */ int idx;
   double I,I2;
   ll_init(Lin2out);
   while(Lin2out->curr != NULL){
@@ -1338,7 +1342,7 @@ void en_user_bhattacharyya_destroy(){
 }
 
 void en_bhattacharyya_update(double* img, long *dims, LL *Lin2out, LL *Lout2in){
-  int x,y,z,idx;
+  /*int x,y,z */ int idx;
   int I;
   ll_init(Lin2out);
   while(Lin2out->curr != NULL){

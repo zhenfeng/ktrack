@@ -1,10 +1,10 @@
 /*********************************************************************
  * sfm_local_chanvese_mex.cpp
  *
- * This file performs the statistical computations needed for running 
- * the localized chan-vese active contour segmentation energy using the 
+ * This file performs the statistical computations needed for running
+ * the localized chan-vese active contour segmentation energy using the
  * Sparse Field method presented by Whitaker.
- * 
+ *
  * written by: Shawn Lankton (4/17/2009) - www.shawnlankton.com
  *
  ********************************************************************/
@@ -24,7 +24,7 @@ void lrbac_vessel_yz(double *img, double *phi, double *label, long *dims,
                      int display){
   double *F;
   double scale[1]; scale[0]=0;
-  int countdown;
+  //int countdown;
 
   //initialize datastructures and statistics
   en_lrbac_init(Lz,img,phi,dims,rad);
@@ -47,7 +47,7 @@ void lrbac_vessel_cv(double *img, double *phi, double *label, long *dims,
                      int display){
   double *F;
   double scale[1]; scale[0]=0;
-  int countdown;
+  //int countdown;
 
   //initialize datastructures and statistics
   en_lrbac_init(Lz,img,phi,dims,rad);
@@ -71,10 +71,10 @@ void lrbac_chanvese(double *img, double *phi, double *label, long *dims,
                     int iter, double rad, double lambda,  short *plhs,int display){
   double *F;
   double scale[1]; scale[0]=0;
-  int countdown;
+  //int countdown;
   //initialize datastructures and statistics
   en_lrbac_init(Lz,img,phi,dims,rad);
-  double Fmax;
+  //double Fmax;
   for(int i=0;i<iter;i++){
     //compute force
 
@@ -98,7 +98,7 @@ void chanvese(double *img, double *phi, double *label, long *dims,
               int iter,double lambda,  short *plhs,int display){
   double *F;
   double scale[1]; scale[0] = 0;
-  int countdown;
+  //int countdown;
 
   //initialize datastructures and statistics
   en_chanvese_init(img,phi,dims);
@@ -125,7 +125,7 @@ void user_chanvese(double *img, double *phi,double penaltyAlpha, double *seed, d
               int iter,double lambda,  short *plhs,int display){
   double *F;
   double scale[1]; scale[0] = 0;
-  int countdown;
+  //int countdown;
 
   //initialize datastructures and statistics
   en_user_chanvese_init(img,phi,dims,seed);
@@ -152,7 +152,7 @@ void lrbac_user_chanvese(double *img, double *phi,double penaltyAlpha, double *s
                     int iter, double rad, double lambda,  short *plhs,int display){
   double *F;
   double scale[1]; scale[0]=0;
-  int countdown;
+  //int countdown;
 
   //initialize datastructures and statistics
   en_lrbac_user_init(Lz,img,phi,dims,rad,seed);
@@ -192,7 +192,7 @@ void lrbac_user_chanvese(double *img, double *phi,double penaltyAlpha, double *s
 
   //destroy old datastructures
   en_lrbac_destroy();
-  en_user_bhattacharyya_destroy();  
+  en_user_bhattacharyya_destroy();
 }
 
 
@@ -202,7 +202,7 @@ void meanvar(double *img, double *phi, double *label, long *dims,
              int iter,double lambda,  short *plhs,int display){
   double *F;
   double scale[1]; scale[0] = 0;
-  int countdown;
+  //int countdown;
 
   //initialize datastructures and statistics
   en_meanvar_init(img,phi,dims);
@@ -224,7 +224,7 @@ void bhattacharyya(double *img, double *phi, double *label, long *dims,
                    int iter,double lambda,  short *plhs,int display){
   double *F;
   double scale[1]; scale[0] = 0;
-  int countdown;
+  //int countdown;
 
   //std::cout<<"Entered in Bhattacharyya"<<std::endl;
 
@@ -250,7 +250,7 @@ void user_bhattacharyya(double *img, double *phi, double penaltyAlpha, double *s
                    int iter,double lambda,  short *plhs,int display){
   double *F;
   double scale[1]; scale[0] = 0;
-  int countdown;
+  //int countdown;
 
   std::cout<<"The display is set to: "<<display<<std::endl;
 //  if(display==1){
@@ -284,7 +284,7 @@ void yezzi(double *img, double *phi, double *label, long *dims,
            int iter,double lambda,  short *plhs,int display){
   double *F;
   double scale[1]; scale[0]=0;
-  int countdown;
+  //int countdown;
 
   //initialize datastructures and statistics
   en_yezzi_init(Lz,img,phi,dims);
@@ -305,7 +305,6 @@ void grow(double *img, double *phi, double *label, long *dims,
            LL *Lz, LL *Ln1, LL *Lp1, LL *Ln2, LL *Lp2, LL *Lin2out, LL *Lout2in,
           int iter,double lambda,  short *plhs,int display){
   double *F;
-  int countdown;
 
   for(int i=0;i<iter;i++){
     //compute force
@@ -324,7 +323,7 @@ void shrink(double *img, double *phi, double *label, long *dims,
             LL *Lz, LL *Ln1, LL *Lp1, LL *Ln2, LL *Lp2, LL *Lin2out, LL *Lout2in,
             int iter,double rad,double lambda, short *plhs,int display){
   double *F;
-  int countdown;
+  //int countdown;
   double scale[1]; scale[0] = 0;
 
   en_lrbac_init(Lz,img,phi,dims,rad);
@@ -347,7 +346,7 @@ void kappa(double *img, double *phi, double *label, long *dims,
            LL *Lz, LL *Ln1, LL *Lp1, LL *Ln2, LL *Lp2, LL *Lin2out, LL *Lout2in,
            int iter,double lambda,  short *plhs,int display){
   double *F;
-  int countdown;
+  //int countdown;
 
   for(int i=0;i<iter;i++){
     //compute force

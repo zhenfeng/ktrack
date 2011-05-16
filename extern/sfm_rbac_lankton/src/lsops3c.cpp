@@ -12,7 +12,7 @@ void ls_iteration(double *F, double *phi, double* label, long* dims,
                   LL* Lz, LL* Ln1, LL* Lp1, LL *Ln2, LL *Lp2,
                   LL *Lin2out, LL* Lout2in){
   int x,y,z,i,idx;
-  int u,d,r,l,f,b;
+  //int u,d,r,l,f,b;
   double p, phi_old;
   LL *Sz, *Sn1, *Sp1, *Sn2, *Sp2;
 
@@ -285,8 +285,8 @@ double ls_min_hood_onlevel(int idx, long x, long y, long z, long *dims, double *
 
 void ls_mask2phi3c(double* mask, double* phi, double* label, long* dims, LL *Lz, LL *Ln1, LL *Ln2, LL *Lp1, LL *Lp2){
   int x,y,z,idx;
-  int i,j,k;
-  int u,d,r,l,f,b;
+  //int i,j,k;
+ // int u,d,r,l,f,b;
   int  flag=0;
 
   //find 'interface' and mark as 0, create Lz
