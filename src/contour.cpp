@@ -136,7 +136,9 @@ void ActiveContourSegmentor::intializeLevelSet(){
 
 void ActiveContourSegmentor::update()
 {
-  // interactive_chanvese(img,phi,U_I_slice,label,dims,Lz,Ln1,Lp1,Ln2,Lp2,Lin2out,Lout2in,iter,rad,lambda,display);
+  lrbac_chanvese(ptr_img,ptr_phi,ptr_lbl,dims,
+           Lz,Ln1,Lp1,Ln2,Lp2,Lin2out,Lout2in,
+           iters_sfls,rad,lambda_curv,NULL,0);
 
   if(iList!=NULL){
     delete[] iList;
