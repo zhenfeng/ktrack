@@ -4,105 +4,73 @@
 
 #include <opencv2/core/core.hpp>
 
-struct LL; // in sfm
+struct LL; // used in sfm, forward declare here
 
-namespace vrcl
+namespace ktrack
 {
+
 
 /** write string on top of image data in-place*/
 void waterMark(const std::string& text, cv::Mat & img);
 
-
-#if 0
-
-class KSegmentor
+class ActiveContourSegmentor
 {
-    private:
-      KSegmentor(); // prevent invalid initialization
-    public:
-        KSegmentor( vtkImageData* image, vtkImageData* label, int sliceIndex );
-        virtual ~KSegmentor();
-        void setNumIterations(int itersToRun);
-        void setCurrIndex(int sliceIndex);
-        void initializeData();
-        void setCurrLabelArray(vtkImageData *label);
-        void intializeLevelSet();
-        void Update();
-
-        /** external interface to update at a voxel */
-        void accumulateUserInput( double value, int i, int j, int k );
-        void copyIntegralDuringPaste( int kFrom, int kTo );
-        void setRadius( int radNew ) {
-          rad = radNew;
-        }
-        void saveCurrentSliceToPNG( const std::string& fileName);
-
-    private:
-        /** internal 'update from input' function */
-        void integrateUserInput( int k );
-
-        /** write to png file. rescale to 255, make sure it has .png ending */
-        void saveMatToPNG( const cv::Mat& source, const std::string& fileName );
-
-/** Does NOT own this memory */
-        vtkImageData *imageVol; //full image volume we are working with
-        vtkImageData *labelVol; //full label volume (at the current time)
-        unsigned short *ptrCurrImage; //ptr to current image slice
-        unsigned short *ptrCurrLabel; //ptr to current label slice
 
 
-/** Might (??) own anything else below */
-        int currSlice;       //the slice we are segmenting
-        int prevSlice;
-        long numberdims;     //for images =2, for volumes =3
-        int *mdims;          //dimensions of "image" we are segmenting (ex.512x512x212)
-        double *imgRange;    //[minImageVal, maxImageVal]
-        double* labelRange;  //[minLabVal, maxLabVal]
+public:
+  ActiveContourSegmentor( ); // prevent invalid initialization
+  ActiveContourSegmentor( cv::Mat& image, cv::Mat& segmap );
+  virtual ~ActiveContourSegmentor( );
+  void initializeData();
+  void update();
+  void setRadius( int radNew );
+private:
 
-        double *img;         // single slice!
-        double *mask;        // single slice!
-        double *U_I_slice;
-        double *U_t_slice;
-
-        double penaltyAlpha; //regularizer for "user constraints" experiments
-        double *seed;        //again, only used in functions for "user constraints" experiments
-        bool useContInit;    //for "user constraints" do we intitialize from seed or initial contour
-        int iter;            //number of iterations to execute
-        double lambda;       //curvature penalty
-        double rad;          //radius of ball used in local-global energies
-        double dthresh;
-        int display;         //is the debug display on/off if ~=0, will display every X iterations
-
-        unsigned short *seg; //seg result from last run of the segmentor
-        short *iList;        //row indices of points on zero level set from last run
-        short *jList;        //column indices of points on zero level set from last run
-        long lengthZLS;      //number of point on the zero level set from last run
+  void intializeLevelSet();
 
 
-        //Level Set Variables Stay persistent
+  cv::Mat        image,  imageF64;  //
+  cv::Mat        phimap, phimapF64; //
+  cv::Mat        maskinitF64;
+  cv::Mat        labelF64;
 
-        /** time-integrated user inputs */
-        std::vector< cv::Mat >  U_integral;
 
-        /** instantaneous user input (stuff that was drawn between running 's') */
-        std::vector< cv::Mat >  U_t;
 
-        double *B, *phi, *C, *label;
-        double *F;
-        double usum, vsum;
-        int    countdown;
-        long    dims[5];
-        long dimz,dimy,dimx;
-        LL *Lz, *Ln1, *Ln2, *Lp1, *Lp2;
-        LL *Sz, *Sn1, *Sn2, *Sp1, *Sp2;
-        LL *Lin2out, *Lout2in;
+  // Warning: everything below is delicate and might leak or do something crazy
+  unsigned char *ptrCurrImage;
+  unsigned char *ptrCurrLabel;
+
+  std::vector<int> mdims; //dimensions of "image" we are segmenting (ex.512x512x212)
+  double *imgRange;       //[minImageVal, maxImageVal]
+  double* labelRange;     //[minLabVal, maxLabVal]
+
+  double *ptr_img;
+  double *ptr_phi;
+  double *ptr_lbl;
+  double *ptr_msk;
+
+  int iters_sfls;      //number of iterations to execute
+  double lambda_curv;  //curvature penalty
+  double rad;          //radius of ball used in local-global energies
+  double dthresh;      // similarity ??
+
+  short *iList;        //row indices of points on zero level set from last run
+  short *jList;        //column indices of points on zero level set from last run
+  long lengthZLS;      //number of point on the zero level set from last run
+
+
+  //Level Set Variables Stay persistent
+  double *B, *C;
+  double *F;
+  double usum, vsum;
+  int    countdown;
+  long    dims[5];
+  long dimz,dimy,dimx;
+  LL *Lz, *Ln1, *Ln2, *Lp1, *Lp2;
+  LL *Sz, *Sn1, *Sn2, *Sp1, *Sp2;
+  LL *Lin2out, *Lout2in;
 
 };
-
-
-#endif
-
-
 
 
 }
