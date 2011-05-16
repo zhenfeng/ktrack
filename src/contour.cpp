@@ -78,7 +78,7 @@ ActiveContourSegmentor::ActiveContourSegmentor(Mat &img_in, Mat &segmap)
 
   dims[2] = 1;
   dims[1] = 1;
-  numdims = 2; // fixed for 2D image stream.
+  int numdims = 2; // fixed for 2D image stream.
   switch(numdims){
   case 3:
     dimz = (int)mdims[2];
