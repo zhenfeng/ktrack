@@ -230,7 +230,7 @@ int main( int argc, char* argv [] )
   std::cout << "usage:  ./ " << argv[0] << " /path/to/images   .file_extension   1_or_0  3.0 "  << endl;
   boost::shared_ptr<SimpleMotionTracker> prob( new SimpleMotionTracker );
 
-
+  
   double diffusion_range = 1.0; 
   if( argc > 4 )  {
     diffusion_range = boost::lexical_cast<double>( argv[4] );
