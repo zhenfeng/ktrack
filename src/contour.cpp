@@ -202,11 +202,16 @@ void ActiveContourSegmentor::update(int iters_in)
 
 
   // delete the old (i,j) levelset indices
+  // MEMORY CRAP WARNING: nothing is in place to handle iList, jList
+  // having varying length! Should be a vector with reserve() called on it
+  // to begin with!
   if(iList!=NULL){
-    delete[] iList;
+    delete iList;
+    iList = NULL;
   }
   if(jList!=NULL){
-    delete[] jList;
+    delete jList;
+    jList = NULL;
   }
 
   //get number and coordinates of point (row, col) on the zero level set
@@ -215,8 +220,14 @@ void ActiveContourSegmentor::update(int iters_in)
 
 ActiveContourSegmentor::~ActiveContourSegmentor(){
 
-  delete [] this->iList;
-  delete [] this->jList;
+  if(iList!=NULL){
+    delete iList;
+    iList = NULL;
+  }
+  if(jList!=NULL){
+    delete jList;
+    jList = NULL;
+  }
 
   ll_destroy(Lz);
   ll_destroy(Ln1);

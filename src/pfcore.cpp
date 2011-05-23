@@ -106,7 +106,7 @@ struct PFTracker::PFCore
     {
       if( weights[k] < wmin ) {
         double sampval = sampler[k];
-        int    sampidx = closestIndex( cdf, sampval );
+        int    sampidx = closestIndex( cdf, sampval ); // EVIL SLOW ALGORITHM
         particles_pred[sampidx].copyTo(particles_estm[k]);
         resample_index[k] = sampidx; // where k-th was resampled from
         weights[k]        = weights[sampidx]/2.0;
@@ -115,15 +115,6 @@ struct PFTracker::PFCore
         resample_index[k] = k;
       }
     }
-    //      particles_pred[k].copyTo(particles_estm[k]);
-    //      if( weights[k] > wmax ) {
-    //        wmax = weights[k];
-    //        idx_max = k;
-    //      } else if ( weights[k] < wmin ) {
-    //        wmin = weights[k];
-    //        idx_min = k;
-    //      }
-    //particles_estm[idx_max].copyTo(particles_estm[idx_min]);
   }
 
   void processNewData(const vector<Mat>& image_data, void* extra_data )

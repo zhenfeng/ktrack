@@ -3,6 +3,7 @@
  *
  *  Created on: Nov 27, 2010
  *      Author: ethan
+ *  modified by peter, Spring 2011
  */
 
 #include "file_io.h"
@@ -14,6 +15,9 @@
 
 using namespace std;
 
+/**  given a "dir" as string and ending extension, put name of files
+     into the vector string. vector is sorted lexicographically.
+  */
 void lsFilesOfType(const char * dir, const string& extension,
         vector<string>& files) {
     files.clear();
@@ -31,8 +35,13 @@ void lsFilesOfType(const char * dir, const string& extension,
         }
     }
     closedir(dp);
+    std::sort(files.begin(), files.end());
 }
 
+/**  given an ending extension, put prefix name of files
+     into the vector string. vector is sorted lexicographically.
+     e.g. dir = "/1941" contains smolensk.jpg, sevastopol.jpg, guderian.jpg
+     and extension = ".jpg" gives files as [guderian, sevastopol, smolensk] */
 void getFilePrefixes(const char * dir, const string& extension,
         vector<string>& files) {
 
@@ -53,6 +62,10 @@ void getFilePrefixes(const char * dir, const string& extension,
     closedir(dp);
     std::sort(files.begin(), files.end());
 }
+
+/** this function is unknown and possibly incompatible with the changes
+    to those getting file lists.
+  */
 int getFileNum(const char * dir, const std::string& extension) {
     int count = 0;
     DIR *dp;
