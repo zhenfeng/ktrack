@@ -38,12 +38,16 @@ public:
   // required interfaces
   //*************************************
 
-  /** evaluate likelihood */
+  /** evaluate likelihood p(z_k | \hat{x}_k ), 'score'
+      assigned to the newly sampled particles */
   virtual void evaluateLikelihood( const std::vector<cv::Mat>& particles,
                                    std::vector<double>& likelihood ) = 0;
 
-  /** propagate dynamics */
-  virtual void propagateDynamics( const std::vector<cv::Mat>& particles_in,
+
+  /** propagate dynamics, sample from the proposal density.
+      the client implementing this should utilize the registered data
+      if proposal density does not depend solely on the previous state.*/
+  virtual void sampleNewParticles( const std::vector<cv::Mat>& particles_in,
                                         std::vector<cv::Mat>& particles_out ) = 0;
 
   /** Number of states in particles.

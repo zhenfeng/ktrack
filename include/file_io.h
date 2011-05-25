@@ -3,6 +3,7 @@
  *
  *  Created on: Nov 27, 2010
  *      Author: ethan
+ *  modified by peter, Spring 2011
  */
 
 #ifndef FILE_IO_CPP_ROBOTVIEW_JNI

@@ -16,8 +16,6 @@ namespace ktrack
 
 #define Assert(x) ( (x) ? int(0) :  throw std::logic_error("broke") )
 
-double gen_rand::range = 1.0; // initialize static variable
-
 
 /** Implement the 'opaque pointer'
   */
@@ -126,13 +124,13 @@ struct PFTracker::PFCore
     // register the data with TrackingProblem
     tracking_problem->registerCurrentData( image_data, extra_data);
 
-    // compute \hat{x}_k | x_{k-1}
-    tracking_problem->propagateDynamics( particles_estm, particles_pred );
+    // compute \hat{x}_k | x_{k-1}, possible depends on z_k (non-SIR case)
+    tracking_problem->sampleNewParticles( particles_estm, particles_pred );
 
     // compute p(z_k | \hat{x}_k )
     tracking_problem->evaluateLikelihood( particles_pred, likelihood);
 
-    // compute w_k \prop w_{k-1} * p(z_k | \hat{x}_k )
+    // compute w_k \prop w_{k-1} * p(z_k | \hat{x}_k ) p( \hat{x}_k | x_{k-1} )
     updateWeights();     // modifies weights
 
     // re-sample to get rid of negligible weight particles

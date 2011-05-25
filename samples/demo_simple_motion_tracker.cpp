@@ -42,7 +42,7 @@ class SimpleMotionTracker : public TrackingProblem
     }
   }
 
-  virtual void propagateDynamics(const vector<Mat> &particles_in,
+  virtual void sampleNewParticles(const vector<Mat> &particles_in,
                                  vector<Mat> &particles_out)
   {
     // \hat{x}_k = F( x_{k-1}, z_k )
