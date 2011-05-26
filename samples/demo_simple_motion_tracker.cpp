@@ -4,6 +4,7 @@
 #include "opencv2/video/background_segm.hpp"
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "boost/lexical_cast.hpp":
 #include "file_io.h"
 
 using namespace std;
@@ -47,7 +48,7 @@ class SimpleMotionTracker : public TrackingProblem
   {
     // \hat{x}_k = F( x_{k-1}, z_k )
     int N = Nparticles();
-    double DiffusionRange = 1.0;
+  
     double dmin,dmax;
     Point pmin,pmax;
     cv::minMaxLoc(dIdt_grey-I_hilo,&dmin,&dmax,&pmin,&pmax);
@@ -189,10 +190,11 @@ public:
 
   }
 
-  void setupTrackingProblem( ) {
-
+  void setupTrackingProblem( const std::vector<double>& data_init ) {
+  
     // put any initializations here
-
+    DiffusionRange = data_init[0]; 
+    cout << "using diffusion range:  " << DiffusionRange << endl;
   }
 
   // **** Data specific to this incarnation of TrackingProblem
@@ -215,8 +217,7 @@ private:
   vector<Mat> particles;
   vector<double> weights;
 
-
-
+  double DiffusionRange;
   double pixel_velocity_x;
   double pixel_velocity_y;
 
@@ -226,8 +227,19 @@ private:
 
 int main( int argc, char* argv [] )
 {
+  std::cout << "usage:  ./ " << argv[0] << " /path/to/images   .file_extension   1_or_0  3.0 "  << endl;
   boost::shared_ptr<SimpleMotionTracker> prob( new SimpleMotionTracker );
-  prob->setupTrackingProblem();
+
+  
+  double diffusion_range = 1.0; 
+  if( argc > 4 )  {
+    diffusion_range = boost::lexical_cast<double>( argv[4] );
+  }
+    
+  vector<double>data_in(1);
+  data_in[0] = diffusion_range; 
+  
+  prob->setupTrackingProblem(data_in);
   PFTracker  pft( prob );
   cout << "successfully created a PFTracker object. " << endl;
   cout << "attempting to read jpeg images from  argv[1] " << endl;

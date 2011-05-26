@@ -3,7 +3,10 @@
 #include "opencv2/video/background_segm.hpp"
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "boost/lexical_cast.hpp":
 #include "contour.h"
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 using namespace cv;
@@ -29,7 +32,8 @@ int main( int argc, char* argv [] )
     cerr << "unable to open video device /dev/video0 " << endl;
     return 1;
   }
-
+  int imgid_ = 0;
+  bool bSaveImages = argc > 1;
   for (;;)   // Main Loop
   {
     capture >> frame; // grab frame data from webcam
@@ -58,6 +62,11 @@ int main( int argc, char* argv [] )
     if( 'q' == key ) // quick if we hit q key
       break;
 
+    if( bSaveImages ) {
+      stringstream ss;
+      ss << "image_" << std::setw(4) << std::setfill('0') << imgid_++ << ".png";
+      imwrite(ss.str(),frame); 
+    }
 
   }
   return 0;
